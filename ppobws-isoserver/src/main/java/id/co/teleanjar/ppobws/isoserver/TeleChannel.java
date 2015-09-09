@@ -12,6 +12,7 @@ import org.jpos.iso.BaseChannel;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOPackager;
+import org.jpos.iso.ISOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,19 +44,47 @@ public class TeleChannel extends BaseChannel {
     //cara otomatis bikin custroctor ALT+INS + pilih overide metho
     @Override
     protected int getMessageLength() throws IOException, ISOException {
-        return super.getMessageLength(); //To change body of generated methods, choose Tools | Templates.
+        
+        int l = 0;
+        int msgLength = 0;
+        
+        byte[] b = new byte[2];
+        while (l==0) {
+            serverIn.readFully(b,0,2);
+            msgLength = ( Integer.parseInt(ISOUtil.hexString(b, 0, 1), 16) * 256 ) + 
+                        ( Integer.parseInt(ISOUtil.hexString(b, 1, 1), 16) );
+            try {
+                if ((l=msgLength) == 0) {
+                    serverOut.write(b);
+                    serverOut.flush();
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                throw new ISOException("Invalid message length " + new String(b) + "length : "+l);
+            }
+        }
+        
+        return l;
     }
 
     @Override
     protected void sendMessageTrailler(ISOMsg m, byte[] b) throws IOException {
-        super.sendMessageTrailler(m, b); //To change body of generated methods, choose Tools | Templates.
         logger.debug("Send Message Trailer : {} ", MSG_TRAILER);
         serverOut.write(MSG_TRAILER);
     }
 
     @Override
     protected void sendMessageLength(int len) throws IOException {
-        super.sendMessageLength(len); //To change body of generated methods, choose Tools | Templates.
+        int b0 = (len / 256);
+        int b1 = (len % 256);
+        
+        byte[] b = new byte[2];
+        
+        b[0] = Hexadecimal.parseByte(Integer.toHexString(b0));
+        b[1] = Hexadecimal.parseByte(Integer.toHexString(b1));
+        
+        logger.debug("Send Message header : {} ", new String(b));
+        serverOut.write(b);
     }
     
     

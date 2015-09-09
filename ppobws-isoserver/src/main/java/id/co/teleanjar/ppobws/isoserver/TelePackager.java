@@ -2,7 +2,7 @@ package id.co.teleanjar.ppobws.isoserver;
 
 import org.jpos.iso.*;
 
-public class TelePackager {
+public class TelePackager extends ISOBasePackager {
 
     public TelePackager() {
         setFieldPackager(new ISOFieldPackager[]{
