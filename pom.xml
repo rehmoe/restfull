@@ -51,6 +51,11 @@
            <artifactId>spring-boot-starter-test</artifactId>
            <scope>test</scope>
        </dependency>
+       <dependency>
+           <groupId>org.springframework.boot</groupId>
+           <artifactId>spring-boot-starter-logging</artifactId>
+       </dependency>
+       
   </dependencies>
   
   <modules>
@@ -58,6 +63,7 @@
       <module>ppobws-domain</module>
       <module>ppobws-dao</module>
       <module>ppobws-restfull</module>
+      <module>ppobws-isoserver</module>
   </modules>
   <build>
       <plugins>
