@@ -7,6 +7,7 @@
 package id.co.teleanjar.ppobws;
 
 import id.co.teleanjar.ppobws.jatelindo.ServiceJatelindo;
+import id.co.teleanjar.ppobws.jatelindo.ServiceJatelindoJDBC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -20,9 +21,14 @@ public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
+//    
+//    @Bean
+//    public ServiceJatelindo serviceJatelindo() {
+//        return new ServiceJatelindo("192.168.1.102", 1423);
+//    }
     
     @Bean
-    public ServiceJatelindo serviceJatelindo() {
-        return new ServiceJatelindo("192.168.1.102", 1423);
+    public ServiceJatelindoJDBC serviceJatelindoJDBC() {
+        return new ServiceJatelindoJDBC("localhost", 3306, "db_biller", "root", "bismillah08");
     }
 }

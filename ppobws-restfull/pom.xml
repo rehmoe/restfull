@@ -26,6 +26,10 @@
            </exclusions>
        </dependency>
        <dependency>
+           <groupId>org.springframework.boot</groupId>
+           <artifactId>spring-boot-starter-jdbc</artifactId>
+       </dependency>
+       <dependency>
            <groupId>id.co.teleanjar</groupId>
            <artifactId>ppobws-jatelindo-service</artifactId>
            <version>${app.version}</version>

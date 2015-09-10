@@ -9,6 +9,7 @@ package id.co.teleanjar.ppobws.web;
 import id.co.teleanjar.ppobws.domain.TagihanPostpaid;
 import id.co.teleanjar.ppobws.domain.User;
 import id.co.teleanjar.ppobws.jatelindo.ServiceJatelindo;
+import id.co.teleanjar.ppobws.jatelindo.ServiceJatelindoJDBC;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -27,7 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/produk")
 public class ServiceJatelindoController {
-    @Autowired private ServiceJatelindo serviceJatelindo;
+    //@Autowired private ServiceJatelindo serviceJatelindo;
+    @Autowired private ServiceJatelindoJDBC serviceJatelindoJDBC;
     
     
     @ResponseBody
@@ -41,7 +43,11 @@ public class ServiceJatelindoController {
         
         try {
             
-            TagihanPostpaid tagihan = serviceJatelindo.inquiryRequest(idpel, idloket, merchantCode);
+            //via biller-ISO
+            //TagihanPostpaid tagihan = serviceJatelindo.inquiryRequest(idpel, idloket, merchantCode);
+            
+            //via database
+            TagihanPostpaid tagihan = serviceJatelindoJDBC.inquiryRequest(idpel, idloket, merchantCode);
             
             resObj.put("rc", "00");
             resObj.put("message", "Sukses");

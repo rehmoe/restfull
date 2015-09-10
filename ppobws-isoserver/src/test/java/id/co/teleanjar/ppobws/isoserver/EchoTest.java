@@ -131,7 +131,7 @@ public class EchoTest {
         msg.set(18, "6012");
         msg.set(33, "1234567");
         msg.set(41, "54FAA005");
-        msg.set(48, "530000000001");
+        msg.set(48, "523030487642");
 
         msg.setPackager(packager);
         System.out.println("msg send : " + new String(msg.pack()));
