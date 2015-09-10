@@ -72,6 +72,7 @@
       <module>ppobws-dao</module>
       <module>ppobws-restfull</module>
       <module>ppobws-isoserver</module>
+      <module>ppobws-jatelindo-service</module>
   </modules>
   <build>
       <plugins>

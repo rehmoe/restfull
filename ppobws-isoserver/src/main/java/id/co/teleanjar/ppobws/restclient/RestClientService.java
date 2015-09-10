@@ -5,14 +5,23 @@
  */
 package id.co.teleanjar.ppobws.restclient;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
@@ -20,7 +29,8 @@ import org.springframework.web.client.RestTemplate;
  */
 @Repository
 public class RestClientService {
-
+    private final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    
     public HttpHeaders createHeaders(final String username, final String password) {
         return new HttpHeaders() {
             {
@@ -45,4 +55,29 @@ public class RestClientService {
         
         return respEntity.getBody();
     }
+    
+    public Map<String, Object> inquiry(String idpel, String idloket, String merchantCode) throws IOException {
+        String uri = "http://localhost:8080/ppobws/api/produk";
+        RestTemplate restTemplate = new RestTemplate();
+        
+        HttpHeaders headers = createHeaders("superuser", "passwordku");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri)
+                .queryParam("idpel", idpel)
+                .queryParam("idloket", idloket)
+                .queryParam("merchantcode", merchantCode);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> httpResp = restTemplate.exchange
+                        (builder.build().encode().toUri(), HttpMethod.GET, entity, String.class);
+        String json = httpResp.getBody();
+        LOGGER.info("JSON [{}]", json);
+        LOGGER.info("STATUS [{}]", httpResp.getStatusCode().toString());
+        
+        Map<String, Object> map = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        map = mapper.readValue(json, new TypeReference<HashMap<String, Object>>(){});
+        return map;
+    }
+    
 }

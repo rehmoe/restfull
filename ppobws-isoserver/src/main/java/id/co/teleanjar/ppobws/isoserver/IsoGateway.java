@@ -10,6 +10,7 @@ package id.co.teleanjar.ppobws.isoserver;
 import id.co.teleanjar.ppobws.restclient.RestClientService;
 import id.co.teleanjar.ppobws.restclient.User;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import org.jpos.iso.ISOException;
@@ -112,13 +113,32 @@ public class IsoGateway implements ISORequestListener  {
             
             String bit48 = isoMsg.getString(48);
             
+            String idpel = isoMsg.getString(48).trim();
+            String idloket = isoMsg.getString(41).trim();
+            String merchantCode = isoMsg.getString(18).trim();
+            
             if (StringUtils.hasText(bit48)) {
                 
-                User user = restClient.getUser(bit48);
+                //request user
+//                User user = restClient.getUser(bit48);
+//                
                 
-                response.setMTI(MTIConstants.INQUIRY_RESPONSE);                
-                response.set(39, "00");
-                response.set(48, user.getUsername()+user.getUsername());
+                Map<String, Object> obj = restClient.inquiry(idpel, idloket, merchantCode);
+                
+                if (!obj.get("rc").toString().equals("00")) {
+                    response.setMTI(MTIConstants.INQUIRY_RESPONSE);                
+                    response.set(39, obj.get("rc").toString());
+                } else {
+                    Map<String, Object> data = (Map<String, Object>) obj.get("data");
+
+                    StringBuilder bit48Builder = new StringBuilder();
+                    bit48Builder.append(data.get("idpel").toString());
+                    bit48Builder.append(org.apache.commons.lang.StringUtils.rightPad(data.get("nama").toString(), 25, " ") );
+                    
+                    response.setMTI(MTIConstants.INQUIRY_RESPONSE);                
+                    response.set(39, "00");
+                    response.set(48, bit48Builder.toString());   
+                }
             }
             else {
                 response.setMTI(MTIConstants.INQUIRY_RESPONSE);

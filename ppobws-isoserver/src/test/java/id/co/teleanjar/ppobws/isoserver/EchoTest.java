@@ -65,7 +65,7 @@ public class EchoTest {
         ((LogSource) isoMux.getISOChannel()).setLogger(logger, "iso8583.tele.channel");
     }
     
-    @Test
+    //@Test
     public void testSignOn() throws Exception {
         Instant sekarang = Instant.now();
 
@@ -128,8 +128,10 @@ public class EchoTest {
         msg.setMTI("2100");
         msg.set(7, formatterBit7.format(Instant.now()));
         msg.set(11, bit11);
+        msg.set(18, "6012");
         msg.set(33, "1234567");
-        msg.set(48, username);
+        msg.set(41, "54FAA005");
+        msg.set(48, "530000000001");
 
         msg.setPackager(packager);
         System.out.println("msg send : " + new String(msg.pack()));

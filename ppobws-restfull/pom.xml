@@ -27,7 +27,7 @@
        </dependency>
        <dependency>
            <groupId>id.co.teleanjar</groupId>
-           <artifactId>ppobws-dao</artifactId>
+           <artifactId>ppobws-jatelindo-service</artifactId>
            <version>${app.version}</version>
        </dependency>
        <dependency>
