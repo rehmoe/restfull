@@ -47,6 +47,12 @@ public class UserController {
     }
     
     @ResponseBody
+    @RequestMapping(method = RequestMethod.GET)
+    public User findUser(@RequestParam("username") String username){
+        return userDao.findByUsername(username);
+    }
+    
+    @ResponseBody
     @RequestMapping(value =  "/b", method = RequestMethod.GET)
     public List<Map<String, Object>> listUserB(){
         

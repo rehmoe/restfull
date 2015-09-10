@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package id.co.teleanjar.ppobws.isoserver;
+package id.co.teleanjar.ppobws;
 
+import id.co.teleanjar.ppobws.isoserver.IsoGateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

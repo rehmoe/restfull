@@ -7,6 +7,8 @@
 package id.co.teleanjar.ppobws.isoserver;
 
 
+import id.co.teleanjar.ppobws.restclient.RestClientService;
+import id.co.teleanjar.ppobws.restclient.User;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
@@ -18,6 +20,8 @@ import org.jpos.iso.ISOSource;
 import org.jpos.util.Log4JListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 /**
  *
@@ -29,6 +33,9 @@ public class IsoGateway implements ISORequestListener  {
     private Integer port=9078;
     private ISOServer isoServer=null;
     
+    @Autowired private RestClientService restClient;
+    
+            
     @PostConstruct
     public void init() {
        try {
@@ -39,10 +46,10 @@ public class IsoGateway implements ISORequestListener  {
            jposLogger.addListener(log4JListener);
 
            TeleChannel channel =  new TeleChannel(new TelePackager());
-           channel.setLogger(jposLogger, "TELE Channel");
+           channel.setLogger(jposLogger, "isolog.teleanjar.gateway");
            
            isoServer = new ISOServer(port, channel, null);
-           isoServer.setLogger(jposLogger, "TELE ISO Server");
+           isoServer.setLogger(jposLogger, "isolog.teleanjar.gateway");
            isoServer.addISORequestListener(this);
            
            new Thread(isoServer).start();
@@ -65,6 +72,10 @@ public class IsoGateway implements ISORequestListener  {
             if (MTIConstants.NETWORK_MANAGEMENT_REQUEST.equalsIgnoreCase(mti)) {
                 return handleNetman(isoSource, isoMsg);
             }         
+            
+            if (MTIConstants.INQUIRY_REQUEST.equalsIgnoreCase(mti)) {
+                return handleInquiry(isoSource, isoMsg);
+            }
         } catch (Exception e) {
             log.info("process ISO Message gagal.");
             log.error(e.getMessage(), e);
@@ -75,10 +86,47 @@ public class IsoGateway implements ISORequestListener  {
     private boolean handleNetman(ISOSource isoSource, ISOMsg isoMsg) throws ISOException, IOException {
         ISOMsg response = (ISOMsg) isoMsg.clone();
         try {
-            response.setMTI(MTIConstants.NETWORK_MANAGEMENT_RESPONSE);
-            response.set(39, "00");
+            
+            String bit33 = isoMsg.getString(33);
+            
+            if (bit33.equals("1234567")) {
+                response.setMTI(MTIConstants.NETWORK_MANAGEMENT_RESPONSE);
+                response.set(39, "00");
+            }
+            else {
+                response.setMTI(MTIConstants.NETWORK_MANAGEMENT_RESPONSE);
+                response.set(39, "98");
+            }
+            
         } catch (ISOException ex) {
             response.setMTI(MTIConstants.NETWORK_MANAGEMENT_RESPONSE);
+            response.set(39, "99");
+        }
+        isoSource.send(response);
+        return true;
+    }
+    
+    private boolean handleInquiry(ISOSource isoSource, ISOMsg isoMsg) throws ISOException, IOException {
+        ISOMsg response = (ISOMsg) isoMsg.clone();
+        try {
+            
+            String bit48 = isoMsg.getString(48);
+            
+            if (StringUtils.hasText(bit48)) {
+                
+                User user = restClient.getUser(bit48);
+                
+                response.setMTI(MTIConstants.INQUIRY_RESPONSE);                
+                response.set(39, "00");
+                response.set(48, user.getUsername()+user.getUsername());
+            }
+            else {
+                response.setMTI(MTIConstants.INQUIRY_RESPONSE);
+                response.set(39, "90");
+            }
+            
+        } catch (Exception ex) {
+            response.setMTI(MTIConstants.INQUIRY_RESPONSE);
             response.set(39, "99");
         }
         isoSource.send(response);
